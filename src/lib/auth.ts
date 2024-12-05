@@ -25,7 +25,8 @@ const adapter = new NodePostgresAdapter(pool, {
 export const lucia = new Lucia(adapter, {
 	sessionCookie: {
 		attributes: {
-			secure: !dev
+			// secure: !dev
+			secure: false
 		}
 	},
 	getUserAttributes: (attributes) => {

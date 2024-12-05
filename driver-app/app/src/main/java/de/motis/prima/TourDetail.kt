@@ -52,11 +52,16 @@ fun PortraitLayout(
     contentPadding: PaddingValues
 ) {
     var isLastEvent = false
+    var isFirstEvent = false
     val tour = toursViewModel.tours.value.filter { t -> t.tour_id == tourId }[0]
     val event = tour.events[eventIndex]
 
     if (eventIndex + 1 == tour.events.size) {
         isLastEvent = true
+    }
+
+    if (eventIndex == 0) {
+        isFirstEvent = true
     }
 
     Column(
@@ -92,10 +97,48 @@ fun PortraitLayout(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
+            Box() {
+                Button(
+                    modifier = Modifier.width(300.dp),
+                    onClick = {
+                        Log.d("click", "navigation")
+                    }
+                ) {
+                    Text(
+                        text = "Navigation",
+                        fontSize = 24.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            if (!isFirstEvent) {
+                Box(
+                    modifier = Modifier
+                        .padding(contentPadding)
+                ) {
+                    Button(
+                        modifier = Modifier.width(86.dp).align(Alignment.CenterStart),
+                        onClick = {
+                            navController.navigate("legs/${tour.tour_id}/${eventIndex - 1}")
+                        }
+                    ) {
+                        Text(
+                            text = "<--",
+                            fontSize = 24.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
             if (!isLastEvent) {
                 Box(
                     modifier = Modifier
-                    .padding(contentPadding)
+                        .padding(contentPadding)
                 ) {
                     Button(
                         modifier = Modifier.width(300.dp),
@@ -104,7 +147,7 @@ fun PortraitLayout(
                         }
                     ) {
                         Text(
-                            text = "Weiter",
+                            text = "Nächstes Fahrziel",
                             fontSize = 24.sp,
                             textAlign = TextAlign.Center
                         )
