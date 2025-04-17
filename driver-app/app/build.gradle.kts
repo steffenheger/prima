@@ -4,6 +4,8 @@ plugins {
     id("com.google.dagger.hilt.android")
     kotlin("kapt")
     id("io.realm.kotlin")
+    //id("com.android.application")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -23,7 +25,8 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "BASE_URL", "\"https://prima.motis-project.de\"")
+            //buildConfigField("String", "BASE_URL", "\"https://prima.motis-project.de\"")
+            buildConfigField("String", "BASE_URL", "\"http://82.165.178.73:8000\"")
         }
         release {
             isMinifyEnabled = false
@@ -64,10 +67,13 @@ dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.material)
 
+    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
+
     implementation(libs.realm)
 
     implementation(libs.hilt.android)
     implementation(libs.androidx.activity.ktx)
+    implementation(libs.firebase.messaging.ktx)
     kapt(libs.hilt.compiler)
     implementation(libs.kotlin.stdlib)
 

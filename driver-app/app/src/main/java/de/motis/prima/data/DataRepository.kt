@@ -1,6 +1,7 @@
 package de.motis.prima.data
 
 import android.util.Log
+import com.google.firebase.messaging.FirebaseMessaging
 import de.motis.prima.app.NotificationHelper
 import de.motis.prima.formatTo
 import de.motis.prima.services.ApiService
@@ -55,7 +56,6 @@ class DataRepository @Inject constructor(
 
     init {
         startRefreshingTours()
-        notificationHelper.createNotificationChannel()
     }
 
     private fun refreshTours(): Flow<Response<List<Tour>>> = flow {
@@ -92,7 +92,7 @@ class DataRepository @Inject constructor(
                     var tours = fetchedTours.filter { t -> t.vehicleId == selectedVehicle.first().id }
                     tours = tours.sortedBy { t -> t.events[0].scheduledTimeStart }
 
-                    val toursDate = getToursForDate(_displayDate.value, selectedVehicle.first().id)
+                    /*val toursDate = getToursForDate(_displayDate.value, selectedVehicle.first().id)
 
                     if (tours.size > toursDate.size) {
                         for (tour in tours) {
@@ -116,7 +116,7 @@ class DataRepository @Inject constructor(
                                 break // only notify on the first unseen tour
                             }
                         }
-                    }
+                    }*/
 
                     setTours(fetchedTours)
                     _toursCache.value = tours
@@ -171,14 +171,6 @@ class DataRepository @Inject constructor(
         _displayDate.value = _displayDate.value.minusDays(1)
         fetchTours()
         _toursForDate.value = getToursForDate(_displayDate.value, _vehicleId)
-    }
-
-    private fun showNotification(msg: String) {
-        notificationHelper.showNotification("Neue Fahrt", msg)
-    }
-
-    fun cancelNotifications() {
-        notificationHelper.cancel()
     }
 
     private fun getToursForDate(date: LocalDate, vehicleId: Int): List<Tour> {

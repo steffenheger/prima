@@ -51,10 +51,6 @@ class TourViewModel @Inject constructor(
 
     private var _tour: TourObject? = null
 
-    init {
-        repository.cancelNotifications()
-    }
-
     fun isInPAst(tourId: Int): Boolean {
         _tour = repository.getTour(tourId)
         if (_tour != null) {
