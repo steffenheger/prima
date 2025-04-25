@@ -10,10 +10,24 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import dagger.hilt.android.AndroidEntryPoint
 import de.motis.prima.MainActivity
 import de.motis.prima.R
+import de.motis.prima.data.DataStoreManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FirebaseService: FirebaseMessagingService() {
+    @Inject
+    lateinit var apiService: ApiService
+
+    @Inject
+    lateinit var dataStore: DataStoreManager
+
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
@@ -29,8 +43,14 @@ class FirebaseService: FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        // Send token to your server
-        Log.d("test", "New FCM token: $token")
+        Log.d("fcm", "Received new token")
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                dataStore.setDeviceInfo(token, true)
+            } catch (e: Exception) {
+                Log.e("fcm", "Failed to store token", e)
+            }
+        }
     }
 
     private fun showNotification(title: String?, body: String?, tourId: String?) {

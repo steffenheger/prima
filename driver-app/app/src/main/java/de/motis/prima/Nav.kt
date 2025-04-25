@@ -8,6 +8,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -15,6 +16,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import de.motis.prima.data.DeviceInfo
 import de.motis.prima.viewmodel.LoginViewModel
 import de.motis.prima.viewmodel.SettingsViewModel
 
@@ -24,11 +26,13 @@ fun Nav(intent: Intent?) {
     val settingsViewModel: SettingsViewModel = hiltViewModel()
     val loginViewModel: LoginViewModel = hiltViewModel()
     val selectedVehicle = settingsViewModel.selectedVehicle.collectAsState().value
+    val deviceInfo by loginViewModel.deviceInfo.collectAsState(DeviceInfo("", "", false))
+    val loggedIn = loginViewModel.isLoggedIn()
 
     if (selectedVehicle == null) {
         LoadingScreen()
     } else {
-        val startDestination = if (!loginViewModel.isLoggedIn()) {
+        val startDestination = if (!loggedIn) {
             "login"
         } else {
             if (selectedVehicle.id == 0) {
@@ -40,6 +44,10 @@ fun Nav(intent: Intent?) {
 
         if (intent != null) {
             Log.d("intent", "Nav:  ${intent.getStringExtra("tourId")}")
+        }
+
+        if (loggedIn && deviceInfo.tokenPending) {
+            loginViewModel.sendDeviceInfo(deviceInfo.deviceId, deviceInfo.fcmToken)
         }
 
         NavHost(navController = navController, startDestination = startDestination) {

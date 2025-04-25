@@ -37,6 +37,12 @@ interface ApiService {
         @Query("tourId") tourId: Int,
         @Query("fare") fare: Int
     ): Response<Void>
+
+    @PUT("api/token")
+    suspend fun sendDeviceInfo(
+        @Query("deviceId") deviceId: String,
+        @Query("token") token: String
+    ): Response<Void>
 }
 
 data class Vehicle(

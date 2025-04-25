@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import de.motis.prima.data.DeviceInfo
 import de.motis.prima.services.Vehicle
 import de.motis.prima.viewmodel.LoginViewModel
 import kotlinx.coroutines.launch

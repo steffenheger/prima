@@ -1,6 +1,7 @@
 package de.motis.prima.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val apiService: ApiService,
-    repository: DataRepository,
+    private val repository: DataRepository,
     private val cookieStore: CookieStore
 ) : ViewModel() {
     private val _navigationEvent = MutableSharedFlow<Boolean>()
@@ -29,6 +30,9 @@ class LoginViewModel @Inject constructor(
 
     private val _accountErrorEvent = MutableSharedFlow<Boolean>()
     val accountErrorEvent = _accountErrorEvent.asSharedFlow()
+
+    val selectedVehicle = repository.selectedVehicle
+    val deviceInfo = repository.deviceInfo
 
     fun isLoggedIn(): Boolean {
         return !cookieStore.isEmpty()
@@ -48,6 +52,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = apiService.login(email, password)
+                Log.d("login", "$response")
                 if (response.isSuccessful) {
                     val r = apiService.validateTicket(0, "")
                     if (r.code() == 404) {
@@ -65,5 +70,19 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    val selectedVehicle = repository.selectedVehicle
+    fun sendDeviceInfo(deviceId: String, token: String) {
+        viewModelScope.launch {
+            try {
+                Log.d("fcm", "Sending token: $token")
+                val response = apiService.sendDeviceInfo(deviceId, token)
+                Log.d("fcm", "$response")
+                if (response.isSuccessful) {
+                    repository.resetTokenPending()
+                    Log.d("fcm", "Token sent.")
+                }
+            } catch (e: Exception) {
+                _networkErrorEvent.emit(Unit)
+            }
+        }
+    }
 }

@@ -1,9 +1,7 @@
 package de.motis.prima.data
 
-import android.util.Log
-import com.google.firebase.messaging.FirebaseMessaging
+import android.provider.Settings
 import de.motis.prima.app.NotificationHelper
-import de.motis.prima.formatTo
 import de.motis.prima.services.ApiService
 import de.motis.prima.services.Tour
 import de.motis.prima.services.Vehicle
@@ -54,8 +52,16 @@ class DataRepository @Inject constructor(
     val selectedVehicle: Flow<Vehicle> = dataStoreManager.selectedVehicleFlow
     private var _vehicleId = 0
 
+    val deviceInfo: Flow<DeviceInfo> = dataStoreManager.deviceInfoFlow
+
     init {
-        startRefreshingTours()
+        //startRefreshingTours()
+    }
+
+    fun resetTokenPending() {
+        CoroutineScope(Dispatchers.IO).launch {
+            dataStoreManager.resetTokenPending()
+        }
     }
 
     private fun refreshTours(): Flow<Response<List<Tour>>> = flow {
