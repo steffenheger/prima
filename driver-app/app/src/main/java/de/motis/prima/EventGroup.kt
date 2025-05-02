@@ -3,6 +3,7 @@ package de.motis.prima
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -407,6 +408,7 @@ fun ShowCustomerDetails(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Log.d("phone", event.customerPhone)
                     if (event.customerPhone != "") {
                         Button(
                             onClick = {
@@ -420,6 +422,12 @@ fun ShowCustomerDetails(
 
                             )
                         }
+                    } else {
+                        Text(
+                            text = "Keine Tel-Nr.",
+                            fontSize = 24.sp,
+                            textAlign = TextAlign.Center
+                        )
                     }
 
                     val hasValidTicket = viewModel.hasValidTicket(event.tour, event.id)

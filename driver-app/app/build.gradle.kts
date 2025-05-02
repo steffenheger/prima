@@ -25,8 +25,8 @@ android {
 
     buildTypes {
         debug {
-            //buildConfigField("String", "BASE_URL", "\"https://prima.motis-project.de\"")
-            buildConfigField("String", "BASE_URL", "\"http://82.165.178.73:8000\"")
+            buildConfigField("String", "BASE_URL", "\"https://app.primaplusoev.de\"")
+            //buildConfigField("String", "BASE_URL", "\"http://82.165.178.73:8000\"")
         }
         release {
             isMinifyEnabled = false
@@ -34,7 +34,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "BASE_URL", "\"https://prima.motis-project.de\"")
+            buildConfigField("String", "BASE_URL", "\"https://app.primaplusoev.de\"")
         }
     }
     buildFeatures {

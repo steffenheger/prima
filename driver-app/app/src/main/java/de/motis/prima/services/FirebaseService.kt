@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
+import androidx.compose.runtime.collectAsState
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -37,7 +38,19 @@ class FirebaseService: FirebaseMessagingService() {
         val body = remoteMessage.notification?.body ?: "Default Body"
 
         if (data.isNotEmpty()) {
-            showNotification(title, body, tourId)
+            /*CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val msgVehicleId = data["vehicleId"]?.toInt()
+                    dataStore.selectedVehicleFlow.collect { value ->
+                        if (value.id == msgVehicleId) {
+                            showNotification(title, body, tourId)
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("error", "Failed to retrieve stored vehicle id", e)
+                }
+            }*/
+            showNotification(title, body, tourId);
         }
     }
 

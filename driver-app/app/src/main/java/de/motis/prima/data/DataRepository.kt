@@ -1,7 +1,5 @@
 package de.motis.prima.data
 
-import android.provider.Settings
-import de.motis.prima.app.NotificationHelper
 import de.motis.prima.services.ApiService
 import de.motis.prima.services.Tour
 import de.motis.prima.services.Vehicle
@@ -28,8 +26,7 @@ class DataRepository @Inject constructor(
     private val dataStoreManager: DataStoreManager,
     private val ticketStore: TicketStore,
     private val tourStore: TourStore,
-    private val apiService: ApiService,
-    private val notificationHelper: NotificationHelper
+    private val apiService: ApiService
 ) {
     val storedTickets = ticketStore.storedTickets
     val storedTours = tourStore.storedTours
@@ -55,12 +52,30 @@ class DataRepository @Inject constructor(
     val deviceInfo: Flow<DeviceInfo> = dataStoreManager.deviceInfoFlow
 
     init {
-        //startRefreshingTours()
+        startRefreshingTours()
     }
 
     fun resetTokenPending() {
         CoroutineScope(Dispatchers.IO).launch {
             dataStoreManager.resetTokenPending()
+        }
+    }
+
+    private fun refreshToursDisplayDate() {
+        val today = displayDate.value
+
+        val tomorrow = today.plusDays(1)
+        val start = today.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val end = tomorrow.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = apiService.getTours(start, end)
+                val fetchedTours = response.body() ?: emptyList()
+                setTours(fetchedTours)
+            } catch (e: Exception) {
+                _networkError.value = true
+            }
         }
     }
 
@@ -97,32 +112,6 @@ class DataRepository @Inject constructor(
 
                     var tours = fetchedTours.filter { t -> t.vehicleId == selectedVehicle.first().id }
                     tours = tours.sortedBy { t -> t.events[0].scheduledTimeStart }
-
-                    /*val toursDate = getToursForDate(_displayDate.value, selectedVehicle.first().id)
-
-                    if (tours.size > toursDate.size) {
-                        for (tour in tours) {
-                            if (toursDate.find { t -> t.tourId == tour.tourId} == null) {
-                                // tour unseen
-                                try {
-                                    val pickup = tour.events.first()
-                                    val currentDay = Date().formatTo("yyyy-MM-dd")
-                                    val pickupDate = Date(pickup.scheduledTimeStart)
-                                    val pickupDay = pickupDate.formatTo("yyyy-MM-dd")
-                                    val pickupTime = pickupDate.formatTo("HH:mm")
-
-                                    if (pickupDay == currentDay) {
-                                        showNotification(
-                                            "$pickupTime, ${pickup.address}"
-                                        )
-                                    }
-                                } catch (e: Exception) {
-                                    Log.d("error", e.message!!)
-                                }
-                                break // only notify on the first unseen tour
-                            }
-                        }
-                    }*/
 
                     setTours(fetchedTours)
                     _toursCache.value = tours
@@ -180,6 +169,8 @@ class DataRepository @Inject constructor(
     }
 
     private fun getToursForDate(date: LocalDate, vehicleId: Int): List<Tour> {
+        refreshToursDisplayDate();
+
         val start = date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
         val end = date.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
         val tours = tourStore.getToursForInterval(start, end)

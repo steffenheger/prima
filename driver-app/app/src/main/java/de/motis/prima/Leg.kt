@@ -75,11 +75,12 @@ fun Leg(
                 if (eventGroups.isNotEmpty()) {
                     var nav = "leg/$tourId/${eventGroupIndex + 1}"
                     if (eventGroupIndex + 1 == eventGroups.size) {
-                        if (legViewModel.isTourStarted(tourId)) {
+                        /*if (legViewModel.isTourStarted(tourId)) {
                             nav = "fare/$tourId"
                         } else {
                             nav = "tours"
-                        }
+                        }*/
+                        nav = "fare/$tourId"
                     }
 
                     BoxWithConstraints {

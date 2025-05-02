@@ -50,10 +50,9 @@ object AppModule {
         dataStoreManager: DataStoreManager,
         ticketStore: TicketStore,
         tourStore: TourStore,
-        apiService: ApiService,
-        notificationHelper: NotificationHelper
+        apiService: ApiService
     ): DataRepository {
-        return DataRepository(dataStoreManager, ticketStore, tourStore, apiService, notificationHelper)
+        return DataRepository(dataStoreManager, ticketStore, tourStore, apiService)
     }
 
     @Provides
